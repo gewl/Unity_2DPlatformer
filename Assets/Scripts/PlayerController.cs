@@ -3,42 +3,52 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
-    // Assigned to player obj during initialize.
-    GameObject player;
+
     // Holds player's position at a given time.
     Vector3 playerPosition;
     // Keeps track of player's (horizontal) movement at a given time.
-    float speed;
+    float displacement;
+    float speed = 50.0f;
 
-	// Use this for initialization
-	void Start () {
-        player = GameObject.Find("Player");
-        speed = 0.0f;
-	}
+    // Reference to objects in 'ground' layer
+    public LayerMask groundLayer;
+
+    //Adjustable variable for jump height
+    private float jumpHeight = 3f;
+
+    // Ref attained at initialize
+    private Rigidbody2D rigidBody;
+    // Checks if a player is grounded
+    bool isGrounded = false;
+    // Get Layer ID for groundLayer;
+    int groundLayerId;
+
+    // Use this for initialization
+    void Start () {
+        // Initialize variables.
+        rigidBody = GetComponent<Rigidbody2D>();
+        groundLayerId = LayerMask.NameToLayer("Ground");
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        // Snapshot of player's position at frame.
-        playerPosition = player.transform.position;
 
         // Run handler function to update player obj's horizontal speed based on player's input (A & D).
-        speed = speedUpdater(speed);
+        displacement = displacementUpdater(displacement);
 
         // Update snapshot's x coordinates according to updated speed value.
-        playerPosition.x += speed;
+        transform.Translate(new Vector3(displacement * Time.deltaTime * speed, 0f, 0f));
 
         // Rough jump code.
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKey(KeyCode.W) && isGrounded)
         {
-            playerPosition.y += 2f;
+            transform.Translate(new Vector3(0f, jumpHeight, 0f));
         }
-
-        // Reassign updated snapshot to player, yielding movement.
-        player.transform.position = playerPosition;
-	}
+        
+    }
 
     // Function to take 'current' horizontal speed and update based on player input.
-    float speedUpdater(float speed)
+    float displacementUpdater(float speed)
     {
         // Max speed of 0.2f in a given direction.
         if (Input.GetKey(KeyCode.D) && speed <= 0.2f)
@@ -99,5 +109,21 @@ public class PlayerController : MonoBehaviour {
 
         // Return for reassignation in update function.
         return speed;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!isGrounded && collision.gameObject.layer == groundLayerId)
+        {
+            isGrounded = true;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (isGrounded && collision.gameObject.layer == groundLayerId)
+        {
+            isGrounded = false;
+        }
     }
 }
