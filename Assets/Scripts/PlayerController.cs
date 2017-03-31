@@ -4,34 +4,28 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-    // Reference to objects in 'ground' layer
-    public LayerMask groundLayer;
-
-    // Keeps track of player's (horizontal) movement at a given time.
     private float speed = 8.0f;
     private float minSpeed = 0.05f;
 
-    //Adjustable variable for jump height
     private float thrust = 14f;
+    private bool isGrounded = false;
+
+    // Ref set in Unity
+    public LayerMask groundLayer;
 
     // Ref attained at initialize
     private Rigidbody2D rb;
-    // Checks if a player is grounded
-    private bool isGrounded = false;
-    // Get Layer ID for groundLayer;
     private int groundLayerId;
 
     // Multi-part jump.
     private int jumpStage;
 
-    // Use this for initialization
     void Start () {
         // Initialize variables.
         rb = GetComponent<Rigidbody2D>();
         groundLayerId = LayerMask.NameToLayer("Ground");
     }
 	
-	// Update is called once per frame
 	void Update () {
 
         float hInput = Input.GetAxis("Horizontal") * speed;
