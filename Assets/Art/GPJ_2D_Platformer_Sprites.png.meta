@@ -1,12 +1,14 @@
 fileFormatVersion: 2
 guid: 175fcc7c1b48b8a44866558fa330a4dd
-timeCreated: 1490995727
+timeCreated: 1491090583
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: Player
     21300002: Ground
     21300004: Enemy
+    21300006: Player_Walk1
+    21300008: Player_Walk2
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -119,6 +121,32 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
+        y: 112
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Player_Walk1
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 112
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Player_Walk2
+      rect:
+        serializedVersion: 2
+        x: 32
         y: 112
         width: 16
         height: 12

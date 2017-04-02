@@ -7,8 +7,8 @@ public class PlayerController : MonoBehaviour {
     private float speed = 8.0f;
     private float minSpeed = 0.05f;
 
-    private float thrust = 14f;
-    private bool isGrounded = false;
+    private float thrust = 20f;
+    private int currentGroundColliders = 0;
 
     // Ref set in Unity
     public LayerMask groundLayer;
@@ -20,34 +20,46 @@ public class PlayerController : MonoBehaviour {
     // Multi-part jump.
     private int jumpStage;
 
+    private Animator playerAnim;
+
     void Start () {
         // Initialize variables.
         rb = GetComponent<Rigidbody2D>();
         groundLayerId = LayerMask.NameToLayer("Ground");
+
+        playerAnim = GetComponent<Animator>();
     }
 	
-	void Update () {
+	void FixedUpdate () {
 
         float hInput = Input.GetAxis("Horizontal") * speed;
-        Vector3 vel = rb.velocity;
+        Vector2 vel = rb.velocity;
 
-        if (Mathf.Abs(hInput) > minSpeed)
+        if (Input.GetKey(KeyCode.D))
         {
-            transform.Translate(new Vector3(hInput * Time.deltaTime, 0, 0));
+            rb.AddForce(transform.right * 20f);
+        } else if (Input.GetKey(KeyCode.A))
+        {
+            rb.AddForce(transform.right * -20f);
+        } else if (Mathf.Abs(vel.x) > 0 && currentGroundColliders > 0)
+        {
+            float cancelXVelocity = vel.x * -1f;
+            rb.AddForce(transform.right * cancelXVelocity * 5f);
         }
 
         // Rough jump code.
         if (Input.GetKey(KeyCode.W) && vel.y == 0f)
         {
-            isGrounded = false;
             rb.AddForce(transform.up * thrust, ForceMode2D.Impulse);
         }
-        else if (!isGrounded)
+        else if (currentGroundColliders == 0)
         {
-            vel.y -= 18f * Time.deltaTime;
+            vel.y -= 50f * Time.deltaTime;
             rb.velocity = vel;
         }
 
+
+        playerAnim.SetFloat("Speed", Mathf.Abs(vel.x));
     }
 
     // Function to take 'current' horizontal speed and update based on player input.
@@ -115,20 +127,20 @@ public class PlayerController : MonoBehaviour {
     //    return speed;
     //}
 
-    // CURRENTLY UNUSED: Switched to "velocity.y == 0" test for groundedness. Keeping code in case of reversion.
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    if (!isGrounded && collision.gameObject.layer == groundLayerId)
-    //    {
-    //        isGrounded = true;
-    //    }
-    //}
+    //CURRENTLY UNUSED: Switched to "velocity.y == 0" test for groundedness.Keeping code in case of reversion.
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer == groundLayerId)
+        {
+            currentGroundColliders++;
+        }
+    }
 
-    //private void OnCollisionExit2D(Collision2D collision)
-    //{
-    //    if (isGrounded && collision.gameObject.layer == groundLayerId)
-    //    {
-    //        isGrounded = false;
-    //    }
-    //}
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer == groundLayerId)
+        {
+            currentGroundColliders--;
+        }
+    }
 }
