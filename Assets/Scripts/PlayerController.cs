@@ -32,8 +32,8 @@ public class PlayerController : MonoBehaviour {
 	
 	void FixedUpdate () {
 
-        float hInput = Input.GetAxis("Horizontal") * speed;
         Vector2 vel = rb.velocity;
+        float absoluteXVelocity = Mathf.Abs(vel.x);
 
         if (Input.GetKey(KeyCode.D))
         {
@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour {
         } else if (Input.GetKey(KeyCode.A))
         {
             rb.AddForce(transform.right * -20f);
-        } else if (Mathf.Abs(vel.x) > 0 && currentGroundColliders > 0)
+        } else if (absoluteXVelocity > 0 && currentGroundColliders > 0)
         {
             float cancelXVelocity = vel.x * -1f;
             rb.AddForce(transform.right * cancelXVelocity * 5f);
@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour {
         }
 
 
-        playerAnim.SetFloat("Speed", Mathf.Abs(vel.x));
+        playerAnim.SetFloat("Speed", absoluteXVelocity);
     }
 
     // Function to take 'current' horizontal speed and update based on player input.
