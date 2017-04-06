@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour {
 
+    private ScoreController scoreController;
+
+    // For changing scoretext on death.
+    int scoreValue = 50;
+
 	void Start () {
-		
+        scoreController = GameObject.Find("ScoreDisplay").GetComponent<ScoreController>();
 	}
 	
 	void Update () {
@@ -20,6 +25,8 @@ public class EnemyController : MonoBehaviour {
             Destroy(gameObject);
             // Boing!
             collision.gameObject.GetComponent<PlayerController>().Jump();
+            // Add to/update score.
+            scoreController.increaseScore(scoreValue);
         }
     }
 }
