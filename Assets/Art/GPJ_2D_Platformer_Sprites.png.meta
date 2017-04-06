@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 175fcc7c1b48b8a44866558fa330a4dd
-timeCreated: 1491274594
+timeCreated: 1491437987
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -11,6 +11,9 @@ TextureImporter:
     21300008: Player_Walk2
     21300010: Enemy_Walk1
     21300012: Enemy_Walk2
+    21300014: Coin1
+    21300016: Coin2
+    21300018: Coin3
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -178,6 +181,45 @@ TextureImporter:
         y: 112
         width: 16
         height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Coin1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 84
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Coin2
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 84
+        width: 4
+        height: 7
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Coin3
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 84
+        width: 1
+        height: 7
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
