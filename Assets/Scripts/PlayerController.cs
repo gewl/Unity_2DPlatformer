@@ -12,10 +12,12 @@ public class PlayerController : MonoBehaviour {
 
     // Ref set in Unity
     public LayerMask groundLayer;
+    public GameObject healthDisplay;
 
     // Ref attained at initialize
     private Rigidbody2D rb;
     private int groundLayerId;
+    private HealthController healthController;
 
     // Multi-part jump.
     private int jumpStage;
@@ -26,6 +28,7 @@ public class PlayerController : MonoBehaviour {
         // Initialize variables.
         rb = GetComponent<Rigidbody2D>();
         groundLayerId = LayerMask.NameToLayer("Ground");
+        healthController = healthDisplay.GetComponent<HealthController>();
 
         playerAnim = GetComponent<Animator>();
     }
@@ -88,6 +91,7 @@ public class PlayerController : MonoBehaviour {
             // This refers to the "body" of the enemy, not the boingable head.
             case "Enemy":
                 Debug.Log("ouch!");
+                healthController.playerDamaged();
                 break;
             default:
                 Debug.Log(collisionGo.tag);

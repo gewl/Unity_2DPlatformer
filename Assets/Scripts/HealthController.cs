@@ -28,9 +28,18 @@ public class HealthController : MonoBehaviour {
         }
 
     }
-	
-	void Update () {
+	    
+    public void playerDamaged()
+    {
+        if (uiHearts.Length == 1)
+        {
+            Debug.Log("Dead");
+        } else
+        {
+            GameObject lastHeart = uiHearts[currentHealth - 1];
+            Destroy(lastHeart);
+            currentHealth -= 1;
+        }
+    }
 
-        
-	}
 }
