@@ -95,9 +95,10 @@ public class PlayerController : MonoBehaviour {
                 healthController.playerDamaged();
 
                 // Repulses players from enemies upon being damaged—for gamefeel and to prevent repeat damage
-                float xVel = (Mathf.Abs(vel.x) > 0) ? vel.x : 6f;
-                float yVel = (Mathf.Abs(vel.y) > 0) ? vel.y : 6f;
-                rb.AddForce(new Vector2(xVel * -3f, yVel * -3f), ForceMode2D.Impulse);
+                int xDir = (Mathf.Abs(vel.x) > 0) ? -1 : 1;
+                int yDir = (Mathf.Abs(vel.y) > 0) ? -1 : 1;
+                int yMov = (vel.y == 0) ? 0 : 1;
+                rb.AddForce(new Vector2(20f * xDir, 20f * yDir * yMov), ForceMode2D.Impulse);
                 break;
             default:
                 Debug.Log(collisionGo.tag);

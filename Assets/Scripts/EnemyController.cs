@@ -14,6 +14,7 @@ public class EnemyController : MonoBehaviour {
     private Rigidbody2D rb;
 
     private bool isDead = false;
+    private bool isMovingLeft = true;
 
 	void Start () {
         scoreController = GameObject.Find("ScoreDisplay").GetComponent<ScoreController>();
@@ -28,19 +29,36 @@ public class EnemyController : MonoBehaviour {
     {
         if (!isDead)
         {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.TransformPoint(new Vector2(-1f, -1f)), 15f, groundLayerMask);
-            Debug.DrawLine(transform.position, hit.point, Color.red);
+            // FIX: raycast gradually 'rising,' jumps to canvas when enemy turns
 
-            Debug.Log(hit.collider);
-
-            if (hit.collider == null)
+            if (isMovingLeft)
             {
-                transform.Translate(new Vector3(1.5f * Time.deltaTime, 0, 0));
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.TransformVector(new Vector2(-1.5f, -1f)), 1.5f, groundLayerMask);
+
+                if (hit.collider != null)
+                {
+                    transform.Translate(new Vector3(-1.5f * Time.deltaTime, 0, 0));
+                }
+                else
+                {
+                    isMovingLeft = false;
+                }
+
             }
             else
             {
-                transform.Translate(new Vector3(-1.5f * Time.deltaTime, 0, 0));
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.TransformVector(new Vector2(1.5f, -1f)), 1.5f, groundLayerMask);
+
+                if (hit.collider != null)
+                {
+                    transform.Translate(new Vector3(1.5f * Time.deltaTime, 0, 0));
+                }
+                else
+                {
+                    isMovingLeft = true;
+                }
             }
+
 
         }
     }
