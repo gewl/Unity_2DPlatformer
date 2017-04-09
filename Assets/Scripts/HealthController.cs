@@ -31,7 +31,7 @@ public class HealthController : MonoBehaviour {
 	    
     public void playerDamaged()
     {
-        if (uiHearts.Length == 1)
+        if (currentHealth == 1)
         {
             Debug.Log("Dead");
         } else

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    private Vector2 vel;
+
     private float speed = 8.0f;
     private float minSpeed = 0.05f;
 
@@ -35,7 +37,7 @@ public class PlayerController : MonoBehaviour {
 	
 	void FixedUpdate () {
 
-        Vector2 vel = rb.velocity;
+        vel = rb.velocity;
         float absoluteXVelocity = Mathf.Abs(vel.x);
 
         if (Input.GetKey(KeyCode.D))
@@ -90,8 +92,12 @@ public class PlayerController : MonoBehaviour {
             // TODO: Implement damage
             // This refers to the "body" of the enemy, not the boingable head.
             case "Enemy":
-                Debug.Log("ouch!");
                 healthController.playerDamaged();
+
+                // Repulses players from enemies upon being damaged—for gamefeel and to prevent repeat damage
+                float xVel = (Mathf.Abs(vel.x) > 0) ? vel.x : 6f;
+                float yVel = (Mathf.Abs(vel.y) > 0) ? vel.y : 6f;
+                rb.AddForce(new Vector2(xVel * -3f, yVel * -3f), ForceMode2D.Impulse);
                 break;
             default:
                 Debug.Log(collisionGo.tag);

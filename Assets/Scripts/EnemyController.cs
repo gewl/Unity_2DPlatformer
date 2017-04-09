@@ -7,6 +7,9 @@ public class EnemyController : MonoBehaviour {
     public BoxCollider2D bodyCollider;
     public BoxCollider2D headCollider;
 
+    private int groundLayerId;
+    private int groundLayerMask;
+
     private ScoreController scoreController;
     private Rigidbody2D rb;
 
@@ -15,14 +18,35 @@ public class EnemyController : MonoBehaviour {
 	void Start () {
         scoreController = GameObject.Find("ScoreDisplay").GetComponent<ScoreController>();
 
+        groundLayerId = LayerMask.NameToLayer("Ground");
+        groundLayerMask = 1 << groundLayerId;
+
         rb = GetComponent<Rigidbody2D>();
 	}
-	
-	void FixedUpdate () {
+
+    private void Update()
+    {
         if (!isDead)
         {
-            transform.Translate(new Vector3(-1.5f * Time.deltaTime, 0, 0));
-        } else
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.TransformPoint(new Vector2(-1f, -1f)), 15f, groundLayerMask);
+            Debug.DrawLine(transform.position, hit.point, Color.red);
+
+            Debug.Log(hit.collider);
+
+            if (hit.collider == null)
+            {
+                transform.Translate(new Vector3(1.5f * Time.deltaTime, 0, 0));
+            }
+            else
+            {
+                transform.Translate(new Vector3(-1.5f * Time.deltaTime, 0, 0));
+            }
+
+        }
+    }
+
+    void FixedUpdate () {
+        if (isDead)
         {
             Vector2 vel = rb.velocity;
             vel.y -= 50f * Time.deltaTime;
