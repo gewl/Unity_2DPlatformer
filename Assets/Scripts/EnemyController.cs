@@ -25,19 +25,22 @@ public class EnemyController : MonoBehaviour {
         rb = GetComponent<Rigidbody2D>();
 	}
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (!isDead)
         {
-            // FIX: raycast gradually 'rising,' jumps to canvas when enemy turns
 
+            // TODO: rn enemies in a row will bump into each other after first reverse. they need to all reverse (include enemy in layer mask?)
             if (isMovingLeft)
             {
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.TransformVector(new Vector2(-1.5f, -1f)), 1.5f, groundLayerMask);
+                RaycastHit2D angleHit = Physics2D.Raycast(transform.position, transform.TransformVector(new Vector2(-1.5f, -1f)), 1.5f, groundLayerMask);
+                Debug.DrawLine(transform.position, angleHit.point);
+                RaycastHit2D lateralHit = Physics2D.Raycast(transform.position, transform.TransformVector(new Vector2(-1.5f, 0f)), 0.5f, groundLayerMask);
+                Debug.DrawLine(transform.position, lateralHit.point);
 
-                if (hit.collider != null)
+                if (angleHit.collider != null && lateralHit.collider == null)
                 {
-                    transform.Translate(new Vector3(-1.5f * Time.deltaTime, 0, 0));
+                    rb.AddForce(transform.right * -10f, 0);
                 }
                 else
                 {
@@ -51,27 +54,23 @@ public class EnemyController : MonoBehaviour {
 
                 if (hit.collider != null)
                 {
-                    transform.Translate(new Vector3(1.5f * Time.deltaTime, 0, 0));
+                    rb.AddForce(transform.right * 10f, 0);
                 }
                 else
                 {
                     isMovingLeft = true;
                 }
             }
-
+            rb.velocity = Vector2.ClampMagnitude(rb.velocity, 3f);
 
         }
-    }
-
-    void FixedUpdate () {
-        if (isDead)
+        else
         {
             Vector2 vel = rb.velocity;
             vel.y -= 50f * Time.deltaTime;
             rb.velocity = vel;
         }
-        
-	}
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

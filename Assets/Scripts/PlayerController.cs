@@ -38,6 +38,8 @@ public class PlayerController : MonoBehaviour {
 	void FixedUpdate () {
 
         vel = rb.velocity;
+        vel.y = Mathf.Floor(vel.y);
+
         float absoluteXVelocity = Mathf.Abs(vel.x);
 
         if (Input.GetKey(KeyCode.D))
@@ -63,6 +65,7 @@ public class PlayerController : MonoBehaviour {
             rb.velocity = vel;
         }
 
+        rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x, -6f, 6f), rb.velocity.y);
 
         playerAnim.SetFloat("Speed", absoluteXVelocity);
     }
@@ -89,13 +92,14 @@ public class PlayerController : MonoBehaviour {
             case "Ground":
                 currentGroundColliders++;
                 break;
-            // TODO: Implement damage
-            // This refers to the "body" of the enemy, not the boingable head.
+            // This refers to colliding with the "body" of the enemy, not the boingable head.
             case "Enemy":
                 healthController.playerDamaged();
 
+                Vector2 colliderVel = collisionGo.GetComponent<Rigidbody2D>().velocity;
+
                 // Repulses players from enemies upon being damaged—for gamefeel and to prevent repeat damage
-                int xDir = (Mathf.Abs(vel.x) > 0) ? -1 : 1;
+                int xDir = (Mathf.Abs(vel.x) > 0) ? 1 : -1;
                 int yDir = (Mathf.Abs(vel.y) > 0) ? -1 : 1;
                 int yMov = (vel.y == 0) ? 0 : 1;
                 rb.AddForce(new Vector2(20f * xDir, 20f * yDir * yMov), ForceMode2D.Impulse);
@@ -110,7 +114,7 @@ public class PlayerController : MonoBehaviour {
     { 
         GameObject collisionGo = collision.gameObject;
 
-        if (collisionGo.layer == groundLayerId)
+        if (collisionGo.tag == "Ground")
         {
             currentGroundColliders--;
         }
