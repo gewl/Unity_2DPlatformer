@@ -99,10 +99,24 @@ public class PlayerController : MonoBehaviour {
                 Vector2 colliderVel = collisionGo.GetComponent<Rigidbody2D>().velocity;
 
                 // Repulses players from enemies upon being damaged—for gamefeel and to prevent repeat damage
-                int xDir = (Mathf.Abs(vel.x) > 0) ? 1 : -1;
-                int yDir = (Mathf.Abs(vel.y) > 0) ? -1 : 1;
-                int yMov = (vel.y == 0) ? 0 : 1;
-                rb.AddForce(new Vector2(20f * xDir, 20f * yDir * yMov), ForceMode2D.Impulse);
+                float xRebound = (colliderVel.x == 0) ? -vel.x : colliderVel.x;
+                float yRebound = (colliderVel.y == 0) ? -vel.y : colliderVel.y;
+
+                xRebound = (xRebound > 0) ? -1 : 1;
+                if (yRebound != 0)
+                {
+                    yRebound = (yRebound > 0) ? -1 : 1;
+                }
+                else
+                {
+                    // Just a little upward bounce for better visual cuing/more satisfying travel
+                    yRebound = 0.1f;
+                }
+
+                Debug.Log(xRebound);
+                Debug.Log(yRebound);
+
+                rb.AddForce(new Vector2(100f * xRebound, 50f * yRebound), ForceMode2D.Impulse);
                 break;
             default:
                 Debug.Log(collisionGo.tag);
