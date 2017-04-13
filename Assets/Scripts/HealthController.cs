@@ -9,6 +9,8 @@ public class HealthController : MonoBehaviour {
     private GameObject heartPrefab;
     protected GameObject[] uiHearts;
 
+    private PlayerController playerController;
+
     private const string HEART_PREFAB = "Prefabs/UIElements/UIHeart";
 
 	void Start () {
@@ -17,6 +19,8 @@ public class HealthController : MonoBehaviour {
         uiHearts = new GameObject[currentHealth];
 
         heartPrefab = Resources.Load<GameObject>(HEART_PREFAB);
+
+        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
 
         for (int i = 0; i < currentHealth; i++)
         {
@@ -34,6 +38,7 @@ public class HealthController : MonoBehaviour {
         if (currentHealth == 1)
         {
             Debug.Log("Dead");
+            playerController.Die();
         } else
         {
             GameObject lastHeart = uiHearts[currentHealth - 1];

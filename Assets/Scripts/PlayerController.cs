@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour {
     // Ref set in Unity
     public LayerMask groundLayer;
     public GameObject healthDisplay;
+    private CapsuleCollider2D bodyCollider;
 
     // Ref attained at initialize
     private Rigidbody2D rb;
@@ -31,6 +32,8 @@ public class PlayerController : MonoBehaviour {
         rb = GetComponent<Rigidbody2D>();
         groundLayerId = LayerMask.NameToLayer("Ground");
         healthController = healthDisplay.GetComponent<HealthController>();
+
+        bodyCollider = GetComponent<CapsuleCollider2D>();
 
         playerAnim = GetComponent<Animator>();
     }
@@ -81,6 +84,15 @@ public class PlayerController : MonoBehaviour {
             rb.velocity = new Vector2(rb.velocity.x, 0);
         }
         rb.AddForce(transform.up * thrust, ForceMode2D.Impulse);
+    }
+
+    public void Die()
+    {
+        rb.AddForce(transform.up * 500f);
+
+        GetComponent<SpriteRenderer>().flipY = true;
+
+        bodyCollider.enabled = false;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

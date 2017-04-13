@@ -100,8 +100,6 @@ public class EnemyController : MonoBehaviour {
 
             GetComponent<SpriteRenderer>().flipY = true;
 
-            // TODO: Implement enemy dying animation
-            //Destroy(gameObject);
             bodyCollider.enabled = false;
             headCollider.enabled = false;
 
