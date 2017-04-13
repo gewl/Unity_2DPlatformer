@@ -96,25 +96,16 @@ public class PlayerController : MonoBehaviour {
             case "Enemy":
                 healthController.playerDamaged();
 
-                Vector2 colliderVel = collisionGo.GetComponent<Rigidbody2D>().velocity;
+                Vector2 colliderVel = collision.rigidbody.velocity;
 
                 // Repulses players from enemies upon being damaged—for gamefeel and to prevent repeat damage
-                float xRebound = (colliderVel.x == 0) ? -vel.x : colliderVel.x;
-                float yRebound = (colliderVel.y == 0) ? -vel.y : colliderVel.y;
+                // This is a little rough because colliderVel references vel of incoming rigidbody AT collision,
+                // not before it. Currently player bounces back in the opposite direction he'd been moving before,
+                // ideally he'd move away from the object that damage him.
+                float xRebound = (vel.x == 0) ? -colliderVel.x : -vel.x;
+                xRebound = (xRebound > 0) ? 1f : -1f;
 
-                xRebound = (xRebound > 0) ? -1 : 1;
-                if (yRebound != 0)
-                {
-                    yRebound = (yRebound > 0) ? -1 : 1;
-                }
-                else
-                {
-                    // Just a little upward bounce for better visual cuing/more satisfying travel
-                    yRebound = 0.1f;
-                }
-
-                Debug.Log(xRebound);
-                Debug.Log(yRebound);
+                float yRebound = (colliderVel.y < 0) ? -0.1f : 0.1f;
 
                 rb.AddForce(new Vector2(100f * xRebound, 50f * yRebound), ForceMode2D.Impulse);
                 break;
