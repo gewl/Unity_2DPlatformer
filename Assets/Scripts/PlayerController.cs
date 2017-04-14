@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour {
     private int jumpTimer;
     private bool hasDoubleJumped = false;
 
+    private bool isDead = false;
+
     // Ref set in Unity
     public LayerMask groundLayer;
     public GameObject healthDisplay;
@@ -76,7 +78,7 @@ public class PlayerController : MonoBehaviour {
             jumpTimer = 10;
             Jump();
         }
-        else if (currentGroundColliders == 0)
+        else if (currentGroundColliders == 0 || isDead)
         {
             vel.y -= 50f * Time.deltaTime;
             rb.velocity = vel;
@@ -103,6 +105,8 @@ public class PlayerController : MonoBehaviour {
     public void Die()
     {
         rb.AddForce(transform.up * 500f);
+
+        isDead = true;
 
         GetComponent<SpriteRenderer>().flipY = true;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour {
+public class GroundEnemyController : MonoBehaviour {
 
     public BoxCollider2D bodyCollider;
     public BoxCollider2D headCollider;
