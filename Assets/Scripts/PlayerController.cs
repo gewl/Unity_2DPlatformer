@@ -6,11 +6,15 @@ public class PlayerController : MonoBehaviour {
 
     private Vector2 vel;
 
-    private float speed = 8.0f;
-    private float minSpeed = 0.05f;
+    // Constant values for movement
+    private const float speed = 8.0f;
+    private const float minSpeed = 0.05f;
+    private const float thrust = 20f;
 
-    private float thrust = 20f;
+    // Variable values for movement
     private int currentGroundColliders = 0;
+    private int jumpTimer;
+    private bool hasDoubleJumped = false;
 
     // Ref set in Unity
     public LayerMask groundLayer;
@@ -40,6 +44,11 @@ public class PlayerController : MonoBehaviour {
 	
 	void FixedUpdate () {
 
+        if (jumpTimer > 0)
+        {
+            jumpTimer--;
+        }
+
         vel = rb.velocity;
         vel.y = Mathf.Floor(vel.y);
 
@@ -58,8 +67,13 @@ public class PlayerController : MonoBehaviour {
         }
 
         // Rough jump code.
-        if (Input.GetKey(KeyCode.W) && vel.y == 0f)
+        if (Input.GetKey(KeyCode.W) && (currentGroundColliders > 0 || hasDoubleJumped == false) && jumpTimer == 0)
         {
+            if (currentGroundColliders == 0)
+            {
+                hasDoubleJumped = true;
+            }
+            jumpTimer = 10;
             Jump();
         }
         else if (currentGroundColliders == 0)
@@ -103,6 +117,7 @@ public class PlayerController : MonoBehaviour {
         {
             case "Ground":
                 currentGroundColliders++;
+                hasDoubleJumped = false;
                 break;
             // This refers to colliding with the "body" of the enemy, not the boingable head.
             case "Enemy":
@@ -117,9 +132,9 @@ public class PlayerController : MonoBehaviour {
                 float xRebound = (vel.x == 0) ? -colliderVel.x : -vel.x;
                 xRebound = (xRebound > 0) ? 1f : -1f;
 
-                float yRebound = (colliderVel.y < 0) ? -0.1f : 0.1f;
+                float yRebound = (vel.y < 0) ? 0.5f : 0.1f;
 
-                rb.AddForce(new Vector2(100f * xRebound, 50f * yRebound), ForceMode2D.Impulse);
+                rb.AddForce(new Vector2(200f * xRebound, 50f * yRebound), ForceMode2D.Impulse);
                 break;
             default:
                 Debug.Log(collisionGo.tag);

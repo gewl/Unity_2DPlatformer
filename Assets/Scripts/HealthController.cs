@@ -38,6 +38,8 @@ public class HealthController : MonoBehaviour {
         if (currentHealth == 1)
         {
             Debug.Log("Dead");
+            GameObject lastHeart = uiHearts[currentHealth - 1];
+            Destroy(lastHeart);
             playerController.Die();
         } else
         {
