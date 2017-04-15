@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     private Vector2 vel;
+    private int count = 0;
 
     // Constant values for movement
     private const float speed = 8.0f;
@@ -16,6 +17,8 @@ public class PlayerController : MonoBehaviour {
     private int jumpTimer;
     private bool hasDoubleJumped = false;
 
+    // Variable values relating to damage
+    private int invulnTimer = 0;
     private bool isDead = false;
 
     // Ref set in Unity
@@ -27,6 +30,7 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody2D rb;
     private int groundLayerId;
     private HealthController healthController;
+    private SpriteRenderer spriteRenderer;
 
     // Multi-part jump.
     private int jumpStage;
@@ -40,6 +44,7 @@ public class PlayerController : MonoBehaviour {
         healthController = healthDisplay.GetComponent<HealthController>();
 
         bodyCollider = GetComponent<CapsuleCollider2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
 
         playerAnim = GetComponent<Animator>();
     }
@@ -49,6 +54,22 @@ public class PlayerController : MonoBehaviour {
         if (jumpTimer > 0)
         {
             jumpTimer--;
+        }
+        if (invulnTimer > 0)
+        {
+            invulnTimer--;
+            if (invulnTimer == 0)
+            {
+                spriteRenderer.enabled = true;
+            }
+            else if (invulnTimer % 10 == 0)
+            {
+                spriteRenderer.enabled = false;
+            }
+            else if (invulnTimer % 5 == 0)
+            {
+                spriteRenderer.enabled = true;
+            }
         }
 
         vel = rb.velocity;
@@ -75,6 +96,8 @@ public class PlayerController : MonoBehaviour {
             {
                 hasDoubleJumped = true;
             }
+            // Without this, jump input could get counted 2 or 3 times. 
+            // Timer decrements 1x/frame after, giving time to escape ground colliders.
             jumpTimer = 10;
             Jump();
         }
@@ -108,7 +131,7 @@ public class PlayerController : MonoBehaviour {
 
         isDead = true;
 
-        GetComponent<SpriteRenderer>().flipY = true;
+        spriteRenderer.flipY = true;
 
         bodyCollider.enabled = false;
     }
@@ -125,7 +148,10 @@ public class PlayerController : MonoBehaviour {
                 break;
             // This refers to colliding with the "body" of the enemy, not the boingable head.
             case "Enemy":
-                healthController.playerDamaged();
+                if (invulnTimer == 0) {
+                    healthController.playerDamaged();
+                    invulnTimer = 40;
+                }
 
                 Vector2 colliderVel = collision.rigidbody.velocity;
 
