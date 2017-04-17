@@ -91,7 +91,7 @@ public class GroundEnemyController : MonoBehaviour {
 
             GetComponent<SpriteRenderer>().flipY = true;
 
-            bodyCollider.enabled = false;
+            bodyCollider.isTrigger = true;
             headCollider.enabled = false;
 
             // Boing!
