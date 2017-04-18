@@ -2,19 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GroundEnemyController : MonoBehaviour {
-
-    public BoxCollider2D bodyCollider;
-    public BoxCollider2D headCollider;
+public class GroundEnemyController : Enemy {
 
     private int groundLayerId;
     private int groundLayerMask;
-
-    private ScoreController scoreController;
-    private Rigidbody2D rb;
-
-    private bool isDead = false;
-    private bool isMovingLeft = true;
 
 	void Start () {
         scoreController = GameObject.Find("ScoreDisplay").GetComponent<ScoreController>();
@@ -97,7 +88,7 @@ public class GroundEnemyController : MonoBehaviour {
             // Boing!
             collision.gameObject.GetComponent<PlayerController>().Jump();
             // Add to/update score.
-            scoreController.increaseScore("Enemy");
+            scoreController.increaseScore(this.transform.name);
         }
     }
 }

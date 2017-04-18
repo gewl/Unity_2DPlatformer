@@ -31,7 +31,8 @@ public class ScoreController : MonoBehaviour {
     {
         valueDict = new Dictionary<string, int>();
         valueDict.Add("Coin", 100);
-        valueDict.Add("Enemy", 50);
+        valueDict.Add("GroundEnemy", 50);
+        valueDict.Add("FlyingEnemy", 150);
     }
 
     void updateUIText ()
