@@ -4,24 +4,26 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour {
 
-    public BoxCollider2D bodyCollider;
+    public Collider2D bodyCollider;
     public BoxCollider2D headCollider;
 
+    // Set in individual children scripts
     protected ScoreController scoreController;
     protected Rigidbody2D rb;
 
     protected bool isDead = false;
     protected bool isMovingLeft = true;
 
-    void Start () {
-		
-	}
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Player")
         {
             isDead = true;
+
+            if (rb.bodyType != RigidbodyType2D.Dynamic)
+            {
+                rb.bodyType = RigidbodyType2D.Dynamic;
+            }
 
             rb.AddForce(transform.up * 500f);
 

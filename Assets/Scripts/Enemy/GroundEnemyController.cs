@@ -8,13 +8,12 @@ public class GroundEnemyController : Enemy {
     private int groundLayerMask;
 
 	void Start () {
-        scoreController = GameObject.Find("ScoreDisplay").GetComponent<ScoreController>();
-
         groundLayerId = LayerMask.NameToLayer("Ground");
         groundLayerMask = 1 << groundLayerId;
 
         rb = GetComponent<Rigidbody2D>();
-	}
+        scoreController = GameObject.Find("ScoreDisplay").GetComponent<ScoreController>();
+    }
 
     private void FixedUpdate()
     {
@@ -72,23 +71,4 @@ public class GroundEnemyController : Enemy {
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.tag == "Player")
-        {
-            isDead = true;
-
-            rb.AddForce(transform.up * 500f);
-
-            GetComponent<SpriteRenderer>().flipY = true;
-
-            bodyCollider.isTrigger = true;
-            headCollider.enabled = false;
-
-            // Boing!
-            collision.gameObject.GetComponent<PlayerController>().Jump();
-            // Add to/update score.
-            scoreController.increaseScore(this.transform.name);
-        }
-    }
 }
