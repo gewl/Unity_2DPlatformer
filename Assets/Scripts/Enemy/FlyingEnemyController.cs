@@ -5,6 +5,12 @@ using UnityEngine;
 public class FlyingEnemyController : Enemy
 {
     private Vector2 startingPos;
+    private Vector3 aggroPos;
+
+    private GameObject playerObj;
+
+    private bool isAggroed = false;
+    private bool isDeaggroing = false;
 
     void Start()
     {
@@ -12,13 +18,11 @@ public class FlyingEnemyController : Enemy
         scoreController = GameObject.Find("ScoreDisplay").GetComponent<ScoreController>();
 
         startingPos = transform.position;
-
-        Debug.Log(startingPos);
     }
 
     private void FixedUpdate()
     {
-        if (!isDead)
+        if (!isDead && !isAggroed && !isDeaggroing)
         {
             if (isMovingLeft)
             {
@@ -39,11 +43,41 @@ public class FlyingEnemyController : Enemy
                 }
             }
         }
-        else
+        else if (isDead)
         {
             Vector2 vel = rb.velocity;
             vel.y -= 50f * Time.deltaTime;
             rb.velocity = vel;
         }
+        else if (isAggroed)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, playerObj.transform.position, 2f * Time.deltaTime);
+
+            if (Vector3.Distance(transform.position, aggroPos) > 5f)
+            {
+                isAggroed = false;
+                isDeaggroing = true;
+            }
+        }
+        else if (isDeaggroing)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, aggroPos, 2f * Time.deltaTime);
+            if (transform.position == aggroPos)
+            {
+                isDeaggroing = false;
+            }
+        }
+    }
+
+    public void aggroOn (GameObject player)
+    {
+        Debug.Log("aggroed");
+
+        playerObj = player;
+        if (!isDeaggroing && !isAggroed)
+        {
+            aggroPos = transform.position;
+        }
+        isAggroed = true;
     }
 }
