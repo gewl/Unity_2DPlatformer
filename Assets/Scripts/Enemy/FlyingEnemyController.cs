@@ -9,8 +9,13 @@ public class FlyingEnemyController : Enemy
 
     private GameObject playerObj;
 
+    private enum Status { Patrolling, Aggroed, Deaggroing, Bonked };
+    private Status currentStatus;
+    private int bonkTimer = 0;
+
     private bool isAggroed = false;
     private bool isDeaggroing = false;
+    private int wasBonked = 0;
 
     void Start()
     {
@@ -18,11 +23,13 @@ public class FlyingEnemyController : Enemy
         scoreController = GameObject.Find("ScoreDisplay").GetComponent<ScoreController>();
 
         startingPos = transform.position;
+
+        currentStatus = Status.Patrolling;
     }
 
     private void FixedUpdate()
     {
-        if (!isDead && !isAggroed && !isDeaggroing)
+        if (!isDead && currentStatus == Status.Patrolling)
         {
             if (isMovingLeft)
             {
@@ -49,35 +56,52 @@ public class FlyingEnemyController : Enemy
             vel.y -= 50f * Time.deltaTime;
             rb.velocity = vel;
         }
-        else if (isAggroed)
+        else if (currentStatus == Status.Aggroed)
         {
             transform.position = Vector2.MoveTowards(transform.position, playerObj.transform.position, 2f * Time.deltaTime);
 
             if (Vector3.Distance(transform.position, aggroPos) > 5f)
             {
-                isAggroed = false;
-                isDeaggroing = true;
+                currentStatus = Status.Deaggroing;
             }
         }
-        else if (isDeaggroing)
+        else if (currentStatus == Status.Deaggroing)
         {
             transform.position = Vector2.MoveTowards(transform.position, aggroPos, 2f * Time.deltaTime);
             if (transform.position == aggroPos)
             {
-                isDeaggroing = false;
+                currentStatus = Status.Patrolling;
+            }
+        }
+        else if (currentStatus == Status.Bonked)
+        {
+            bonkTimer--;
+            Vector2 vel = rb.velocity;
+
+            rb.AddForce(new Vector2(-vel.x * 100f * Time.deltaTime, -vel.y * 100f * Time.deltaTime));
+
+            if (bonkTimer == 0)
+            {
+                rb.velocity = Vector3.zero;
+                currentStatus = Status.Aggroed;
             }
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        currentStatus = Status.Bonked;
+        bonkTimer = 60;
+    }
+
     public void aggroOn (GameObject player)
     {
-        Debug.Log("aggroed");
 
         playerObj = player;
         if (!isDeaggroing && !isAggroed)
         {
             aggroPos = transform.position;
         }
-        isAggroed = true;
+        currentStatus = Status.Aggroed;
     }
 }
