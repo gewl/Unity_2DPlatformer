@@ -133,7 +133,7 @@ public class PlayerController : MonoBehaviour {
 
         spriteRenderer.flipY = true;
 
-        bodyCollider.enabled = false;
+        bodyCollider.isTrigger = true;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

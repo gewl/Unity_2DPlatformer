@@ -6,6 +6,12 @@ public class BottomCatcherController : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Destroy(collision.gameObject);
+        if (collision.gameObject.tag == "Player")
+        {
+            Debug.Log("PLayer entered");
+        } else
+        {
+            Destroy(collision.gameObject);
+        }
     }
 }
