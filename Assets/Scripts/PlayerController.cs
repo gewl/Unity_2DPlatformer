@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour {
     // For respawning
     public GameObject lastCheckpoint;
 
+    private HealthController hc;
+
     // Constant values for movement
     private const float speed = 8.0f;
     private const float minSpeed = 0.05f;
@@ -48,6 +50,8 @@ public class PlayerController : MonoBehaviour {
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         playerAnim = GetComponent<Animator>();
+
+        hc = GameObject.FindObjectOfType<HealthController>();
     }
 	
 	void FixedUpdate () {
@@ -144,6 +148,8 @@ public class PlayerController : MonoBehaviour {
         bodyCollider.isTrigger = false;
 
         transform.position = lastCheckpoint.transform.position;
+
+        hc.RefreshHealth();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

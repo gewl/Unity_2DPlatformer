@@ -49,4 +49,18 @@ public class HealthController : MonoBehaviour {
         }
     }
 
+    public void RefreshHealth()
+    {
+        currentHealth = 3;
+        for (int i = 0; i < currentHealth; i++)
+        {
+            GameObject uiHeart = Instantiate(heartPrefab, this.transform, false);
+            uiHeart.name = "Heart_" + i;
+            uiHeart.transform.localPosition = new Vector2(15f + (i * 35f), -15f);
+
+            uiHearts[i] = uiHeart;
+        }
+
+    }
+
 }

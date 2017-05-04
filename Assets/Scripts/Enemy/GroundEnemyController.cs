@@ -30,8 +30,6 @@ public class GroundEnemyController : Enemy {
                 int angleHitsCount = bodyCollider.Raycast(new Vector2(-1.5f, -1f), angleHits, 1.5f, groundLayerMask);
                 Debug.DrawLine(transform.position, angleHits[0].point);
                 int lateralHitsCount = bodyCollider.Raycast(new Vector2(-1.5f, 0f), lateralHits, 0.7f, enemyZoneLayerMask);
-                //int lateralHitsCount = bodyCollider.Raycast(transform.forward, lateralHits, 0.7f, enemyZoneLayerMask);
-                //Debug.DrawLine(transform.position, transform.forward);
 
                 if (angleHitsCount > 0 && lateralHitsCount == 0)
                 {
@@ -39,7 +37,6 @@ public class GroundEnemyController : Enemy {
                 }
                 else
                 {
-                    Debug.Log(lateralHits[0].collider.gameObject);
                     isMovingLeft = false;
                 }
             }
