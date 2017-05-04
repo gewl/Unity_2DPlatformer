@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-    private Vector2 vel;
-    private int count = 0;
+    // For respawning
+    public GameObject lastCheckpoint;
 
     // Constant values for movement
     private const float speed = 8.0f;
@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
     private const float thrust = 20f;
 
     // Variable values for movement
+    private Vector2 vel;
     private int currentGroundColliders = 0;
     private int jumpTimer;
     private bool hasDoubleJumped = false;
@@ -134,6 +135,15 @@ public class PlayerController : MonoBehaviour {
         spriteRenderer.flipY = true;
 
         bodyCollider.isTrigger = true;
+    }
+
+    public void Respawn()
+    {
+        isDead = false;
+        spriteRenderer.flipY = false;
+        bodyCollider.isTrigger = false;
+
+        transform.position = lastCheckpoint.transform.position;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

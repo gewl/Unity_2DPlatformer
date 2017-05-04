@@ -4,13 +4,17 @@ using UnityEngine;
 
 public class Checkpoint : MonoBehaviour {
 
-	// Use this for initialization
+    private PlayerController pc;
+
 	void Start () {
-		
+        pc = GameObject.FindObjectOfType<PlayerController>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Player")
+        {
+            pc.lastCheckpoint = this.gameObject;
+        }
+    }
 }

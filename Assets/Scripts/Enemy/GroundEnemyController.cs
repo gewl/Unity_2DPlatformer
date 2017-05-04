@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class GroundEnemyController : Enemy {
 
-    private int groundLayerId;
     private int groundLayerMask;
+    private LayerMask enemyZoneLayerMask;
 
 	void Start () {
-        groundLayerId = LayerMask.NameToLayer("Ground");
-        groundLayerMask = 1 << groundLayerId;
+        groundLayerMask = Physics2D.DefaultRaycastLayers & LayerMask.GetMask("Ground");
+
+        enemyZoneLayerMask = ~(1 << LayerMask.NameToLayer("EnemyZone"));
 
         rb = GetComponent<Rigidbody2D>();
         scoreController = GameObject.Find("ScoreDisplay").GetComponent<ScoreController>();
@@ -28,8 +29,9 @@ public class GroundEnemyController : Enemy {
 
                 int angleHitsCount = bodyCollider.Raycast(new Vector2(-1.5f, -1f), angleHits, 1.5f, groundLayerMask);
                 Debug.DrawLine(transform.position, angleHits[0].point);
-                int lateralHitsCount = bodyCollider.Raycast(new Vector2(-1.5f, 0f), lateralHits, 0.7f);
-                Debug.DrawLine(transform.position, lateralHits[0].point);
+                int lateralHitsCount = bodyCollider.Raycast(new Vector2(-1.5f, 0f), lateralHits, 0.7f, enemyZoneLayerMask);
+                //int lateralHitsCount = bodyCollider.Raycast(transform.forward, lateralHits, 0.7f, enemyZoneLayerMask);
+                //Debug.DrawLine(transform.position, transform.forward);
 
                 if (angleHitsCount > 0 && lateralHitsCount == 0)
                 {
@@ -37,6 +39,7 @@ public class GroundEnemyController : Enemy {
                 }
                 else
                 {
+                    Debug.Log(lateralHits[0].collider.gameObject);
                     isMovingLeft = false;
                 }
             }
