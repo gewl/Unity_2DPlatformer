@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
     private const float speed = 8.0f;
     private const float minSpeed = 0.05f;
     private const float thrust = 20f;
+    private const float bounceBack = 500f;
 
     // Variable values for movement
     private Vector2 vel;
@@ -22,7 +23,7 @@ public class PlayerController : MonoBehaviour {
 
     // Variable values relating to damage
     private int invulnTimer = 0;
-    private bool isDead = false;
+    public bool isDead = false;
 
     // Ref set in Unity
     public LayerMask groundLayer;
@@ -146,6 +147,7 @@ public class PlayerController : MonoBehaviour {
         isDead = false;
         spriteRenderer.flipY = false;
         bodyCollider.isTrigger = false;
+        currentGroundColliders = 0;
 
         transform.position = lastCheckpoint.transform.position;
 
@@ -175,12 +177,18 @@ public class PlayerController : MonoBehaviour {
                 // This is a little rough because colliderVel references vel of incoming rigidbody AT collision,
                 // not before it. Currently player bounces back in the opposite direction he'd been moving before,
                 // ideally he'd move away from the object that damage him.
-                float xRebound = (vel.x == 0) ? -colliderVel.x : -vel.x;
-                xRebound = (xRebound > 0) ? 1f : -1f;
+                float xRebound;
+                if (vel.x != 0)
+                {
+                    xRebound = (vel.x > 0) ? -bounceBack : bounceBack;
+                } else
+                {
+                    xRebound = (colliderVel.x < 0) ? -bounceBack : bounceBack;
+                }
 
                 float yRebound = (vel.y < 0) ? 0.5f : 0.1f;
 
-                rb.AddForce(new Vector2(200f * xRebound, 50f * yRebound), ForceMode2D.Impulse);
+                rb.AddForce(new Vector2(xRebound, 50f * yRebound), ForceMode2D.Impulse);
                 break;
             default:
                 Debug.Log(collisionGo.tag);
