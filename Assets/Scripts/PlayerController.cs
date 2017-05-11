@@ -54,6 +54,23 @@ public class PlayerController : MonoBehaviour {
 
         hc = GameObject.FindObjectOfType<HealthController>();
     }
+
+    void Update()
+    {
+        // Rough jump code.
+        if (Input.GetKeyDown(KeyCode.W) && (currentGroundColliders > 0 || hasDoubleJumped == false) && jumpTimer == 0)
+        {
+            if (currentGroundColliders == 0)
+            {
+                hasDoubleJumped = true;
+            }
+            // Without this, jump input could get counted 2 or 3 times. 
+            // Timer decrements 1x/frame after, giving time to escape ground colliders.
+            jumpTimer = 10;
+            Jump();
+        }
+
+    }
 	
 	void FixedUpdate () {
 
@@ -83,6 +100,11 @@ public class PlayerController : MonoBehaviour {
 
         float absoluteXVelocity = Mathf.Abs(vel.x);
 
+        if (currentGroundColliders > 0 && vel.y == 0)
+        {
+            hasDoubleJumped = false;
+        }
+
         if (Input.GetKey(KeyCode.D))
         {
             rb.AddForce(transform.right * 20f);
@@ -94,20 +116,7 @@ public class PlayerController : MonoBehaviour {
             float cancelXVelocity = vel.x * -1f;
             rb.AddForce(transform.right * cancelXVelocity * 5f);
         }
-
-        // Rough jump code.
-        if (Input.GetKey(KeyCode.W) && (currentGroundColliders > 0 || hasDoubleJumped == false) && jumpTimer == 0)
-        {
-            if (currentGroundColliders == 0)
-            {
-                hasDoubleJumped = true;
-            }
-            // Without this, jump input could get counted 2 or 3 times. 
-            // Timer decrements 1x/frame after, giving time to escape ground colliders.
-            jumpTimer = 10;
-            Jump();
-        }
-        else if (currentGroundColliders == 0 || isDead)
+        if (currentGroundColliders == 0 || isDead)
         {
             vel.y -= 50f * Time.deltaTime;
             rb.velocity = vel;
@@ -162,7 +171,6 @@ public class PlayerController : MonoBehaviour {
         {
             case "Ground":
                 currentGroundColliders++;
-                hasDoubleJumped = false;
                 break;
             // This refers to colliding with the "body" of the enemy, not the boingable head.
             case "Enemy":

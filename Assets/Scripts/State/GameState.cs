@@ -26,5 +26,4 @@ public class GameState : MonoBehaviour {
         player.SetActive(true);
         player.GetComponent<PlayerController>().Respawn();
     }
-	
 }
