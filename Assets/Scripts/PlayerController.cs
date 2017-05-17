@@ -21,6 +21,9 @@ public class PlayerController : MonoBehaviour {
     private int jumpTimer;
     private bool hasDoubleJumped = false;
 
+    private int currentLaddersTouching = 0;
+    private float laddersX = 0f;
+
     // Variable values relating to damage
     private int invulnTimer = 0;
     public bool isDead = false;
@@ -125,6 +128,11 @@ public class PlayerController : MonoBehaviour {
         rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x, -6f, 6f), rb.velocity.y);
 
         playerAnim.SetFloat("Speed", absoluteXVelocity);
+
+        if (Input.GetKey(KeyCode.Space) && currentLaddersTouching > 0)
+        {
+            this.transform.position = new Vector2(laddersX, this.transform.position.y);
+        }
     }
 
     // Getting ready for separating rendering & logic
@@ -161,6 +169,21 @@ public class PlayerController : MonoBehaviour {
         transform.position = lastCheckpoint.transform.position;
 
         hc.RefreshHealth();
+    }
+
+    public void TouchingLadder(float x)
+    {
+        if (currentLaddersTouching == 0)
+        {
+            laddersX = x;
+        }
+
+        currentLaddersTouching++;
+    }
+
+    public void LeavingLadder()
+    {
+        currentLaddersTouching--;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -211,6 +234,6 @@ public class PlayerController : MonoBehaviour {
         if (collisionGo.tag == "Ground")
         {
             currentGroundColliders--;
-        }
+        } 
     }
 }
