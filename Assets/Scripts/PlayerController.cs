@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour {
 
     private HealthController hc;
 
+    public PlayerState state = PlayerState.walking;
+
     // Constant values for movement
     private const float speed = 8.0f;
     private const float minSpeed = 0.05f;
