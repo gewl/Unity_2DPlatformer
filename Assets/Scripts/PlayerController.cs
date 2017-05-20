@@ -76,8 +76,9 @@ public class PlayerController : MonoBehaviour {
         }
 
     }
-	
-	void FixedUpdate () {
+
+    void FixedUpdate()
+    {
 
         if (jumpTimer > 0)
         {
@@ -113,10 +114,12 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKey(KeyCode.D))
         {
             rb.AddForce(transform.right * 20f);
-        } else if (Input.GetKey(KeyCode.A))
+        }
+        else if (Input.GetKey(KeyCode.A))
         {
             rb.AddForce(transform.right * -20f);
-        } else if (absoluteXVelocity > 0 && currentGroundColliders > 0)
+        }
+        else if (absoluteXVelocity > 0 && currentGroundColliders > 0)
         {
             float cancelXVelocity = vel.x * -1f;
             rb.AddForce(transform.right * cancelXVelocity * 5f);
@@ -136,6 +139,7 @@ public class PlayerController : MonoBehaviour {
             this.transform.position = new Vector2(laddersX, this.transform.position.y);
         }
     }
+    //   }
 
     // Getting ready for separating rendering & logic
     // Public so enemy logic can call on head-hit
