@@ -5,31 +5,42 @@ using UnityEngine;
 
 // adapted from a combination of a post by LightStriker on the Unity3d forums
 // and Game Programming Patterns by Robert Nystrom
-public class CharacterStateMachine : MonoBehaviour {
+public class PlayerStateMachine : MonoBehaviour {
 
     private object parent;
-
     public object Parent { get { return parent; } }
 
-    private CharacterState previousState;
-    public CharacterState PreviousState { get { return previousState; } }
+    private GameObject player;
+    public GameObject Player { get { return player; } }
 
-    private CharacterState currentState;
-    public CharacterState CurrentState { get { return currentState; } }
+    private PlayerController playerController;
+    public PlayerController PlayerController { get { return playerController; } }
 
-    private CharacterState nextState;
-    public CharacterState NextState { get { return nextState; } }
+    private PlayerState previousState;
+    public PlayerState PreviousState { get { return previousState; } }
+
+    private PlayerState currentState;
+    public PlayerState CurrentState { get { return currentState; } }
+
+    private PlayerState nextState;
+    public PlayerState NextState { get { return nextState; } }
 
     private bool forced = false;
     
-    public CharacterStateMachine (CharacterStateMachine parent)
+    public PlayerStateMachine (PlayerStateMachine parent)
     {
         this.parent = parent;
     }
 
-    public CharacterStateMachine (MonoBehaviour parent)
+    public PlayerStateMachine (MonoBehaviour parent)
     {
         this.parent = parent;
+    }
+
+    public void Start()
+    {
+        player = GameObject.FindGameObjectWithTag("Player");
+        playerController = player.GetComponent<PlayerController>();
     }
 
     public void Update()
@@ -61,7 +72,7 @@ public class CharacterStateMachine : MonoBehaviour {
         currentState.FixedUpdate();
     }
 
-    public void SwitchState (CharacterState nextState)
+    public void SwitchState (PlayerState nextState)
     {
         if (forced)
         {
@@ -76,7 +87,7 @@ public class CharacterStateMachine : MonoBehaviour {
         this.nextState = nextState;
     }
 
-    public void ForceSwitchState (CharacterState nextState)
+    public void ForceSwitchState (PlayerState nextState)
     {
         if (forced)
         {
@@ -93,17 +104,17 @@ public class CharacterStateMachine : MonoBehaviour {
     }
 }
 
-public abstract class CharacterState
+public abstract class PlayerState
 {
-    private CharacterStateMachine machine;
+    private PlayerStateMachine machine;
 
-    public CharacterStateMachine Machine { get { return machine; } }
+    public PlayerStateMachine Machine { get { return machine; } }
 
     protected int priority = 1;
 
     public int Priority { get { return priority; } }
 
-    public CharacterState (CharacterStateMachine machine)
+    public PlayerState (PlayerStateMachine machine)
     {
         this.machine = machine;
     }
@@ -115,4 +126,18 @@ public abstract class CharacterState
     public virtual void Update() { }
 
     public virtual void FixedUpdate() { }
+}
+
+public class WalkState : PlayerState
+{
+    public WalkState(PlayerStateMachine machine) 
+        : base (machine) { }
+
+    public override void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            Machine.PlayerController.Jump();
+        }
+    }
 }
