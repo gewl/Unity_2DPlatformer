@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour {
 
     private HealthController hc;
 
+    private PlayerStateMachine psm;
+
     // Constant values for movement
     private const float speed = 8.0f;
     private const float minSpeed = 0.05f;
@@ -22,6 +24,7 @@ public class PlayerController : MonoBehaviour {
     private bool hasDoubleJumped = false;
 
     private int currentLaddersTouching = 0;
+    public int CurrentLaddersTouching { get { return currentLaddersTouching;  } }
     private float laddersX = 0f;
 
     // Variable values relating to damage
@@ -55,89 +58,99 @@ public class PlayerController : MonoBehaviour {
 
         playerAnim = GetComponent<Animator>();
 
+        psm = ScriptableObject.CreateInstance<PlayerStateMachine>();
+
         hc = GameObject.FindObjectOfType<HealthController>();
     }
 
     void Update()
     {
-        // Rough jump code.
-        if (Input.GetKeyDown(KeyCode.W) && (currentGroundColliders > 0 || hasDoubleJumped == false) && jumpTimer == 0)
-        {
-            if (currentGroundColliders == 0)
-            {
-                hasDoubleJumped = true;
-            }
-            // Without this, jump input could get counted 2 or 3 times. 
-            // Timer decrements 1x/frame after, giving time to escape ground colliders.
-            jumpTimer = 10;
-            Jump();
-        }
+        psm.Update();
+        //// Rough jump code.
+        //if (Input.GetKeyDown(KeyCode.W) && (currentGroundColliders > 0 || hasDoubleJumped == false) && jumpTimer == 0)
+        //{
+        //    if (currentGroundColliders == 0)
+        //    {
+        //        hasDoubleJumped = true;
+        //    }
+        //    // Without this, jump input could get counted 2 or 3 times. 
+        //    // Timer decrements 1x/frame after, giving time to escape ground colliders.
+        //    jumpTimer = 10;
+        //    Jump();
+        //}
 
     }
 
     void FixedUpdate()
     {
-
-        if (jumpTimer > 0)
-        {
-            jumpTimer--;
-        }
-        if (invulnTimer > 0)
-        {
-            invulnTimer--;
-            if (invulnTimer == 0)
-            {
-                spriteRenderer.enabled = true;
-            }
-            else if (invulnTimer % 10 == 0)
-            {
-                spriteRenderer.enabled = false;
-            }
-            else if (invulnTimer % 5 == 0)
-            {
-                spriteRenderer.enabled = true;
-            }
-        }
+        psm.FixedUpdate();
 
         vel = rb.velocity;
         vel.y = Mathf.Floor(vel.y);
 
         float absoluteXVelocity = Mathf.Abs(vel.x);
 
-        if (currentGroundColliders > 0 && vel.y == 0)
-        {
-            hasDoubleJumped = false;
-        }
-
-        if (Input.GetKey(KeyCode.D))
-        {
-            rb.AddForce(transform.right * 20f);
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            rb.AddForce(transform.right * -20f);
-        }
-        else if (absoluteXVelocity > 0 && currentGroundColliders > 0)
-        {
-            float cancelXVelocity = vel.x * -1f;
-            rb.AddForce(transform.right * cancelXVelocity * 5f);
-        }
-        if (currentGroundColliders == 0 || isDead)
-        {
-            vel.y -= 50f * Time.deltaTime;
-            rb.velocity = vel;
-        }
-
         rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x, -6f, 6f), rb.velocity.y);
 
         playerAnim.SetFloat("Speed", absoluteXVelocity);
 
-        if (Input.GetKey(KeyCode.Space) && currentLaddersTouching > 0)
-        {
-            this.transform.position = new Vector2(laddersX, this.transform.position.y);
-        }
+
+        //if (jumpTimer > 0)
+        //{
+        //    jumpTimer--;
+        //}
+        //if (invulnTimer > 0)
+        //{
+        //    invulnTimer--;
+        //    if (invulnTimer == 0)
+        //    {
+        //        spriteRenderer.enabled = true;
+        //    }
+        //    else if (invulnTimer % 10 == 0)
+        //    {
+        //        spriteRenderer.enabled = false;
+        //    }
+        //    else if (invulnTimer % 5 == 0)
+        //    {
+        //        spriteRenderer.enabled = true;
+        //    }
+        //}
+
+
+        //float absoluteXVelocity = Mathf.Abs(vel.x);
+
+        //if (currentGroundColliders > 0 && vel.y == 0)
+        //{
+        //    hasDoubleJumped = false;
+        //}
+
+        //if (absoluteXVelocity > 0 && currentGroundColliders > 0)
+        //{
+        //    float cancelXVelocity = vel.x * -1f;
+        //    rb.AddForce(transform.right * cancelXVelocity * 5f);
+        //}
+        //if (currentGroundColliders == 0 || isDead)
+        //{
+        //    vel.y -= 50f * Time.deltaTime;
+        //    rb.velocity = vel;
+        //}
+
+
+        //if (Input.GetKey(KeyCode.Space) && currentLaddersTouching > 0)
+        //{
+        //    this.transform.position = new Vector2(laddersX, this.transform.position.y);
+        //}
     }
-    //   }
+
+    public void MoveLeft()
+    {
+        rb.AddForce(transform.right * -30f );
+    }
+
+    public void MoveRight()
+    {
+        rb.AddForce(transform.right * 30f );
+    }
 
     // Getting ready for separating rendering & logic
     // Public so enemy logic can call on head-hit

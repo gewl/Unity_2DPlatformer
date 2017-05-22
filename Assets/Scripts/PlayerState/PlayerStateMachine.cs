@@ -5,16 +5,19 @@ using UnityEngine;
 
 // adapted from a combination of a post by LightStriker on the Unity3d forums
 // and Game Programming Patterns by Robert Nystrom
-public class PlayerStateMachine : MonoBehaviour {
+public class PlayerStateMachine : ScriptableObject {
 
-    private object parent;
-    public object Parent { get { return parent; } }
+    //private object parent;
+    //public object Parent { get { return parent; } }
 
     private GameObject player;
     public GameObject Player { get { return player; } }
 
     private PlayerController playerController;
     public PlayerController PlayerController { get { return playerController; } }
+
+    private Rigidbody2D playerRb;
+    public Rigidbody2D PlayerRb { get { return playerRb; } }
 
     private PlayerState previousState;
     public PlayerState PreviousState { get { return previousState; } }
@@ -26,25 +29,31 @@ public class PlayerStateMachine : MonoBehaviour {
     public PlayerState NextState { get { return nextState; } }
 
     private bool forced = false;
-    
-    public PlayerStateMachine (PlayerStateMachine parent)
-    {
-        this.parent = parent;
-    }
 
-    public PlayerStateMachine (MonoBehaviour parent)
+    //public PlayerStateMachine (PlayerStateMachine parent)
+    //{
+    //    this.parent = parent;
+    //}
+
+    //public PlayerStateMachine (MonoBehaviour parent)
+    //{
+    //    this.parent = parent;
+    //}
+    public void Awake()
     {
-        this.parent = parent;
+        currentState = new WalkState(this);
+        player = GameObject.FindGameObjectWithTag("Player");
+        playerController = player.GetComponent<PlayerController>();
+        playerRb = player.GetComponent<Rigidbody2D>();
     }
 
     public void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
-        playerController = player.GetComponent<PlayerController>();
     }
 
     public void Update()
     {
+        Debug.Log(currentState);
         if (nextState != null)
         {
             if (currentState != null)
@@ -69,7 +78,10 @@ public class PlayerStateMachine : MonoBehaviour {
 
     public void FixedUpdate()
     {
-        currentState.FixedUpdate();
+        if (currentState != null)
+        {
+            currentState.FixedUpdate();
+        }
     }
 
     public void SwitchState (PlayerState nextState)
@@ -133,11 +145,117 @@ public class WalkState : PlayerState
     public WalkState(PlayerStateMachine machine) 
         : base (machine) { }
 
+    public override void Enter()
+    {
+        base.Enter();
+    }
+
     public override void Update()
     {
         if (Input.GetKeyDown(KeyCode.W))
         {
             Machine.PlayerController.Jump();
+            Machine.SwitchState(new JumpState(Machine));
         }
     }
+
+    public override void FixedUpdate()
+    {
+        if (Input.GetKey(KeyCode.A))
+        {
+            Machine.PlayerController.MoveLeft();
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            Machine.PlayerController.MoveRight();
+        }
+
+        Vector2 vel = Machine.PlayerRb.velocity;
+        if (vel.y > 0)
+        {
+            Machine.ForceSwitchState(new JumpState(Machine));
+        }
+        float absoluteXVel = Mathf.Abs(vel.x);
+
+        if (absoluteXVel > 0)
+        {
+            float cancelXVelocity = vel.x * -1f;
+            Machine.PlayerRb.AddForce(Machine.Player.transform.right * cancelXVelocity * 5f);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && Machine.PlayerController.CurrentLaddersTouching > 0)
+        {
+            Machine.SwitchState(new LadderState(Machine));
+        }
+
+    }
+}
+
+public class JumpState : PlayerState
+{
+    public JumpState(PlayerStateMachine machine)
+        : base(machine) { }
+
+    private bool hasDoubleJumped;
+    private int jumpTimer;
+
+    public override void Enter()
+    {
+        base.Enter();
+
+        hasDoubleJumped = false;
+        jumpTimer = 20;
+    }
+
+    public override void Update()
+    {
+        if (jumpTimer > 0)
+        {
+            jumpTimer--;
+        }
+        
+
+        if (Input.GetKey(KeyCode.W) && jumpTimer == 0 && hasDoubleJumped == false)
+        {
+            Machine.PlayerController.Jump();
+            hasDoubleJumped = true;
+        }
+    }
+
+    public override void FixedUpdate()
+    {
+        if (Input.GetKey(KeyCode.A))
+        {
+            Machine.PlayerController.MoveLeft();
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            Machine.PlayerController.MoveRight();
+        }
+        Vector2 vel = Machine.PlayerRb.velocity;
+        if (vel.y == 0)
+        {
+            Machine.ForceSwitchState(new WalkState(Machine));
+        }
+        vel.y -= 50f * Time.deltaTime;
+        Machine.PlayerRb.velocity = vel;
+    }
+}
+
+public class InvulnState : PlayerState
+{
+    public InvulnState(PlayerStateMachine machine)
+        : base(machine) { }
+}
+
+public class LadderState : PlayerState
+{
+    public LadderState(PlayerStateMachine machine)
+        : base(machine) { }
+}
+
+public class DeadState : PlayerState
+{
+    public DeadState(PlayerStateMachine machine)
+        : base(machine) { }
 }
