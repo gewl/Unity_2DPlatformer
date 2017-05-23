@@ -12,8 +12,7 @@ public class PlayerController : MonoBehaviour {
     private PlayerStateMachine psm;
 
     // Constant values for movement
-    private const float speed = 8.0f;
-    private const float minSpeed = 0.05f;
+    private const float speed = 30f;
     private const float thrust = 20f;
     private const float bounceBack = 500f;
 
@@ -66,6 +65,7 @@ public class PlayerController : MonoBehaviour {
 
     void Update()
     {
+        //Debug.Log(currentLaddersTouching);
         psm.Update();
         //// Rough jump code.
         //if (Input.GetKeyDown(KeyCode.W) && (currentGroundColliders > 0 || hasDoubleJumped == false) && jumpTimer == 0)
@@ -150,12 +150,23 @@ public class PlayerController : MonoBehaviour {
 
     public void MoveLeft()
     {
-        rb.AddForce(transform.right * -30f);
+        rb.AddForce(transform.right * -speed);
     }
 
     public void MoveRight()
     {
-        rb.AddForce(transform.right * 30f);
+        rb.AddForce(transform.right * speed);
+    }
+
+    //for ladder movement—0 gravity on rigidbody2d is assumed
+    public void MoveUp()
+    {
+        rb.AddForce(transform.up * speed);
+    } 
+
+    public void MoveDown()
+    {
+        rb.AddForce(transform.up * -speed);
     }
 
     // Getting ready for separating rendering & logic

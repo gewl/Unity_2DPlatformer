@@ -53,7 +53,7 @@ public class PlayerStateMachine : ScriptableObject {
 
     public void Update()
     {
-        Debug.Log(currentState);
+        //Debug.Log(currentState);
         if (nextState != null)
         {
             if (currentState != null)
@@ -171,9 +171,10 @@ public class WalkState : PlayerState
         }
 
         Vector2 vel = Machine.PlayerRb.velocity;
-        if (vel.y > 0)
+        Debug.Log(vel.y);
+        if (Mathf.Abs(vel.y) > 0)
         {
-            Machine.ForceSwitchState(new JumpState(Machine));
+            Machine.SwitchState(new JumpState(Machine));
         }
         float absoluteXVel = Mathf.Abs(vel.x);
 
@@ -239,6 +240,11 @@ public class JumpState : PlayerState
         }
         vel.y -= 50f * Time.deltaTime;
         Machine.PlayerRb.velocity = vel;
+
+        if (Input.GetKeyDown(KeyCode.Space) && Machine.PlayerController.CurrentLaddersTouching > 0)
+        {
+            Machine.SwitchState(new LadderState(Machine));
+        }
     }
 }
 
@@ -254,6 +260,8 @@ public class LadderState : PlayerState
         : base(machine) { }
 
     private int leaveTimer;
+    private int playerLayer;
+    private int groundLayer;
 
     public override void Enter()
     {
@@ -261,25 +269,57 @@ public class LadderState : PlayerState
         leaveTimer = 5;
 
         Machine.Player.transform.position = new Vector2(Machine.PlayerController.LaddersX, Machine.Player.transform.position.y);
-        Machine.PlayerRb.bodyType = RigidbodyType2D.Static;
+        //Machine.PlayerRb.bodyType = RigidbodyType2D.Static;
+        Machine.PlayerRb.velocity = new Vector2(0f, 0f);
+        Machine.PlayerRb.gravityScale = 0f;
+
+        Vector3 position = Machine.PlayerRb.transform.position;
+        Machine.PlayerRb.transform.position = new Vector3(position.x, position.y, 2f);
+
+        if (playerLayer == 0)
+        {
+            playerLayer = LayerMask.NameToLayer("Player");
+            groundLayer = LayerMask.NameToLayer("Ground");
+            Debug.Log(groundLayer);
+            Debug.Log(playerLayer);
+        }
+
+        Physics2D.IgnoreLayerCollision(playerLayer, groundLayer);
     }
 
     public override void Exit()
     {
         base.Exit();
 
-        Machine.PlayerRb.bodyType = RigidbodyType2D.Dynamic;
+        Machine.PlayerRb.gravityScale = 1f;
+
+        Vector3 position = Machine.PlayerRb.transform.position;
+        Machine.PlayerRb.transform.position = new Vector3(position.x, position.y, 0f);
+
+        Physics2D.IgnoreLayerCollision(playerLayer, groundLayer, false);
     }
 
     public override void Update()
     {
+        Debug.Log(Physics2D.GetIgnoreLayerCollision(playerLayer, groundLayer));
         if (leaveTimer > 0)
         {
             leaveTimer--;
         }
-        if (Input.GetKeyDown(KeyCode.Space) && leaveTimer == 0)
+        if ((Input.GetKeyDown(KeyCode.Space) && leaveTimer == 0) || (Machine.PlayerController.CurrentLaddersTouching == 0))
         {
             Machine.SwitchState(new JumpState(Machine));
+        }
+
+        if (Input.GetKey(KeyCode.W))
+        {
+            Machine.PlayerController.MoveUp();
+        } else if (Input.GetKey(KeyCode.S))
+        {
+            Machine.PlayerController.MoveDown();
+        } else
+        {
+            Machine.PlayerRb.velocity = new Vector2(0f, 0f);
         }
     }
 }

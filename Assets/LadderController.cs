@@ -22,6 +22,7 @@ public class LadderController : MonoBehaviour {
     {
         if (collision.gameObject.tag == "Player")
         {
+            Debug.Log("player leaving ladder");
             pc.LeavingLadder();
         }
     }
