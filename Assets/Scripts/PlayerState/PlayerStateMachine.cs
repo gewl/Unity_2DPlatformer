@@ -280,8 +280,6 @@ public class LadderState : PlayerState
         {
             playerLayer = LayerMask.NameToLayer("Player");
             groundLayer = LayerMask.NameToLayer("Ground");
-            Debug.Log(groundLayer);
-            Debug.Log(playerLayer);
         }
 
         Physics2D.IgnoreLayerCollision(playerLayer, groundLayer);
@@ -301,7 +299,6 @@ public class LadderState : PlayerState
 
     public override void Update()
     {
-        Debug.Log(Physics2D.GetIgnoreLayerCollision(playerLayer, groundLayer));
         if (leaveTimer > 0)
         {
             leaveTimer--;
