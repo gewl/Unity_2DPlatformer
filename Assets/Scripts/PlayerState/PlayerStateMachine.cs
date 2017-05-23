@@ -252,6 +252,36 @@ public class LadderState : PlayerState
 {
     public LadderState(PlayerStateMachine machine)
         : base(machine) { }
+
+    private int leaveTimer;
+
+    public override void Enter()
+    {
+        base.Enter();
+        leaveTimer = 5;
+
+        Machine.Player.transform.position = new Vector2(Machine.PlayerController.LaddersX, Machine.Player.transform.position.y);
+        Machine.PlayerRb.bodyType = RigidbodyType2D.Static;
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+
+        Machine.PlayerRb.bodyType = RigidbodyType2D.Dynamic;
+    }
+
+    public override void Update()
+    {
+        if (leaveTimer > 0)
+        {
+            leaveTimer--;
+        }
+        if (Input.GetKeyDown(KeyCode.Space) && leaveTimer == 0)
+        {
+            Machine.SwitchState(new JumpState(Machine));
+        }
+    }
 }
 
 public class DeadState : PlayerState

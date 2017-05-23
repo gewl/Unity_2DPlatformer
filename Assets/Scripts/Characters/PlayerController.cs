@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour {
     private int currentLaddersTouching = 0;
     public int CurrentLaddersTouching { get { return currentLaddersTouching;  } }
     private float laddersX = 0f;
+    public float LaddersX { get { return laddersX; } }
 
     // Variable values relating to damage
     private int invulnTimer = 0;
@@ -85,14 +86,19 @@ public class PlayerController : MonoBehaviour {
     {
         psm.FixedUpdate();
 
-        vel = rb.velocity;
-        vel.y = Mathf.Floor(vel.y);
+        if (rb.bodyType != RigidbodyType2D.Static)
+        {
+            vel = rb.velocity;
+            vel.y = Mathf.Floor(vel.y);
 
-        float absoluteXVelocity = Mathf.Abs(vel.x);
+            float absoluteXVelocity = Mathf.Abs(vel.x);
+            rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x, -6f, 6f), rb.velocity.y);
 
-        rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x, -6f, 6f), rb.velocity.y);
-
-        playerAnim.SetFloat("Speed", absoluteXVelocity);
+            playerAnim.SetFloat("Speed", absoluteXVelocity);
+        } else
+        {
+            playerAnim.SetFloat("Speed", 0);
+        }
 
 
         //if (jumpTimer > 0)
@@ -144,12 +150,12 @@ public class PlayerController : MonoBehaviour {
 
     public void MoveLeft()
     {
-        rb.AddForce(transform.right * -30f );
+        rb.AddForce(transform.right * -30f);
     }
 
     public void MoveRight()
     {
-        rb.AddForce(transform.right * 30f );
+        rb.AddForce(transform.right * 30f);
     }
 
     // Getting ready for separating rendering & logic
