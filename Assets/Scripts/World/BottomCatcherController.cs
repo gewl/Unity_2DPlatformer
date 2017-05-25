@@ -19,7 +19,6 @@ public class BottomCatcherController : MonoBehaviour {
         {
             Debug.Log("Player entered");
             gs.GameOver();
-            //pc.Respawn();
         } else
         {
             Destroy(collision.gameObject);

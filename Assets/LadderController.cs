@@ -14,7 +14,6 @@ public class LadderController : MonoBehaviour {
     {
         if (collision.gameObject.tag == "Player")
         {
-            Debug.Log("player touching ladder");
             pc.TouchingLadder(this.transform.position.x);
         }
     }
@@ -22,7 +21,6 @@ public class LadderController : MonoBehaviour {
     {
         if (collision.gameObject.tag == "Player")
         {
-            Debug.Log("player leaving ladder");
             pc.LeavingLadder();
         }
     }

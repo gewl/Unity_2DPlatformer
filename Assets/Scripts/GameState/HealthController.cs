@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class HealthController : MonoBehaviour {
 
-    int currentHealth;
+    private int currentHealth;
+    public int CurrentHealth { get { return currentHealth; } }
 
     private GameObject heartPrefab;
     protected GameObject[] uiHearts;
@@ -30,23 +31,14 @@ public class HealthController : MonoBehaviour {
 
             uiHearts[i] = uiHeart;
         }
-
     }
-	    
-    public void playerDamaged()
+
+    public int DamagePlayer()
     {
-        if (currentHealth == 1)
-        {
-            Debug.Log("Dead");
-            GameObject lastHeart = uiHearts[currentHealth - 1];
-            Destroy(lastHeart);
-            playerController.Die();
-        } else
-        {
-            GameObject lastHeart = uiHearts[currentHealth - 1];
-            Destroy(lastHeart);
-            currentHealth -= 1;
-        }
+        GameObject lastHeart = uiHearts[currentHealth - 1];
+        Destroy(lastHeart);
+        currentHealth -= 1;
+        return currentHealth;
     }
 
     public void RefreshHealth()

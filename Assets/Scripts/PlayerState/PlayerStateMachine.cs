@@ -19,6 +19,8 @@ public class PlayerStateMachine : ScriptableObject {
     private Rigidbody2D playerRb;
     public Rigidbody2D PlayerRb { get { return playerRb; } }
 
+    private HealthController healthController;
+
     private PlayerState previousState;
     public PlayerState PreviousState { get { return previousState; } }
 
@@ -30,30 +32,43 @@ public class PlayerStateMachine : ScriptableObject {
 
     private bool forced = false;
 
-    //public PlayerStateMachine (PlayerStateMachine parent)
-    //{
-    //    this.parent = parent;
-    //}
-
-    //public PlayerStateMachine (MonoBehaviour parent)
-    //{
-    //    this.parent = parent;
-    //}
     public void Awake()
     {
         currentState = new WalkState(this);
         player = GameObject.FindGameObjectWithTag("Player");
         playerController = player.GetComponent<PlayerController>();
         playerRb = player.GetComponent<Rigidbody2D>();
+        healthController = GameObject.FindObjectOfType<HealthController>();
     }
 
-    public void Start()
+    public void Start() { }
+    
+    public void AttemptToDamage()
     {
+        if (IsInState(typeof(InvulnState)) == true)
+        {
+            return;
+        }
+
+        int currentHealth = healthController.DamagePlayer();
+
+        if (currentHealth > 0)
+        {
+            ForceSwitchState(new InvulnState(this));
+        } else
+        {
+            ForceSwitchState(new DeadState(this));
+        }
+    }
+
+    public void Respawn()
+    {
+        ForceSwitchState(new WalkState(this));
     }
 
     public void Update()
     {
-        //Debug.Log(currentState);
+        Debug.Log(currentState);
         if (nextState != null)
         {
             if (currentState != null)
@@ -171,7 +186,6 @@ public class WalkState : PlayerState
         }
 
         Vector2 vel = Machine.PlayerRb.velocity;
-        Debug.Log(vel.y);
         if (Mathf.Abs(vel.y) > 0)
         {
             Machine.SwitchState(new JumpState(Machine));
@@ -252,6 +266,47 @@ public class InvulnState : PlayerState
 {
     public InvulnState(PlayerStateMachine machine)
         : base(machine) { }
+
+    private int invulnTimer;
+
+    public override void Enter()
+    {
+        invulnTimer = 40;
+    }
+
+    public override void Exit()
+    {
+        Machine.PlayerRb.drag = 0;
+    }
+
+    public override void Update()
+    {
+        if (invulnTimer > 0)
+        {
+            invulnTimer--;
+            if (invulnTimer == 0)
+            {
+                Machine.PlayerController.Blink();
+            } else if (invulnTimer % 10 == 0)
+            {
+                Machine.PlayerRb.drag = 10;
+                Machine.PlayerController.Blink();
+            } else if (invulnTimer % 5 == 0)
+            {
+                Machine.PlayerController.Blink();
+            }
+        } else
+        {
+            Machine.SwitchState(new WalkState(Machine));
+        }
+    }
+
+    public override void FixedUpdate()
+    {
+        Vector2 vel = Machine.PlayerRb.velocity;
+        vel.y -= 50f * Time.deltaTime;
+        Machine.PlayerRb.velocity = vel;
+    }
 }
 
 public class LadderState : PlayerState
@@ -325,4 +380,16 @@ public class DeadState : PlayerState
 {
     public DeadState(PlayerStateMachine machine)
         : base(machine) { }
+
+    public override void Enter()
+    {
+        Machine.PlayerController.DieAnim();
+    }
+
+    public override void FixedUpdate()
+    {
+        Vector2 vel = Machine.PlayerRb.velocity;
+        vel.y -= 50f * Time.deltaTime;
+        Machine.PlayerRb.velocity = vel;
+    }
 }

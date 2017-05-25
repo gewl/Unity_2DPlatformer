@@ -28,18 +28,15 @@ public class PlayerController : MonoBehaviour {
     public float LaddersX { get { return laddersX; } }
 
     // Variable values relating to damage
-    private int invulnTimer = 0;
     public bool isDead = false;
 
     // Ref set in Unity
     public LayerMask groundLayer;
-    public GameObject healthDisplay;
     private CapsuleCollider2D bodyCollider;
 
     // Ref attained at initialize
     private Rigidbody2D rb;
     private int groundLayerId;
-    private HealthController healthController;
     private SpriteRenderer spriteRenderer;
 
     // Multi-part jump.
@@ -51,7 +48,6 @@ public class PlayerController : MonoBehaviour {
         // Initialize variables.
         rb = GetComponent<Rigidbody2D>();
         groundLayerId = LayerMask.NameToLayer("Ground");
-        healthController = healthDisplay.GetComponent<HealthController>();
 
         bodyCollider = GetComponent<CapsuleCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -60,26 +56,12 @@ public class PlayerController : MonoBehaviour {
 
         psm = ScriptableObject.CreateInstance<PlayerStateMachine>();
 
-        hc = GameObject.FindObjectOfType<HealthController>();
     }
 
     void Update()
     {
-        //Debug.Log(currentLaddersTouching);
+        // delegate to finite state machine
         psm.Update();
-        //// Rough jump code.
-        //if (Input.GetKeyDown(KeyCode.W) && (currentGroundColliders > 0 || hasDoubleJumped == false) && jumpTimer == 0)
-        //{
-        //    if (currentGroundColliders == 0)
-        //    {
-        //        hasDoubleJumped = true;
-        //    }
-        //    // Without this, jump input could get counted 2 or 3 times. 
-        //    // Timer decrements 1x/frame after, giving time to escape ground colliders.
-        //    jumpTimer = 10;
-        //    Jump();
-        //}
-
     }
 
     void FixedUpdate()
@@ -99,53 +81,6 @@ public class PlayerController : MonoBehaviour {
         {
             playerAnim.SetFloat("Speed", 0);
         }
-
-
-        //if (jumpTimer > 0)
-        //{
-        //    jumpTimer--;
-        //}
-        //if (invulnTimer > 0)
-        //{
-        //    invulnTimer--;
-        //    if (invulnTimer == 0)
-        //    {
-        //        spriteRenderer.enabled = true;
-        //    }
-        //    else if (invulnTimer % 10 == 0)
-        //    {
-        //        spriteRenderer.enabled = false;
-        //    }
-        //    else if (invulnTimer % 5 == 0)
-        //    {
-        //        spriteRenderer.enabled = true;
-        //    }
-        //}
-
-
-        //float absoluteXVelocity = Mathf.Abs(vel.x);
-
-        //if (currentGroundColliders > 0 && vel.y == 0)
-        //{
-        //    hasDoubleJumped = false;
-        //}
-
-        //if (absoluteXVelocity > 0 && currentGroundColliders > 0)
-        //{
-        //    float cancelXVelocity = vel.x * -1f;
-        //    rb.AddForce(transform.right * cancelXVelocity * 5f);
-        //}
-        //if (currentGroundColliders == 0 || isDead)
-        //{
-        //    vel.y -= 50f * Time.deltaTime;
-        //    rb.velocity = vel;
-        //}
-
-
-        //if (Input.GetKey(KeyCode.Space) && currentLaddersTouching > 0)
-        //{
-        //    this.transform.position = new Vector2(laddersX, this.transform.position.y);
-        //}
     }
 
     public void MoveLeft()
@@ -182,7 +117,12 @@ public class PlayerController : MonoBehaviour {
         rb.AddForce(transform.up * thrust, ForceMode2D.Impulse);
     }
 
-    public void Die()
+    public void Blink()
+    {
+        spriteRenderer.enabled = !spriteRenderer.enabled;
+    }
+
+    public void DieAnim()
     {
         rb.AddForce(transform.up * 500f);
 
@@ -203,6 +143,7 @@ public class PlayerController : MonoBehaviour {
         transform.position = lastCheckpoint.transform.position;
 
         hc.RefreshHealth();
+        psm.Respawn();
     }
 
     public void TouchingLadder(float x)
@@ -231,10 +172,7 @@ public class PlayerController : MonoBehaviour {
                 break;
             // This refers to colliding with the "body" of the enemy, not the boingable head.
             case "Enemy":
-                if (invulnTimer == 0) {
-                    healthController.playerDamaged();
-                    invulnTimer = 40;
-                }
+                psm.AttemptToDamage();
 
                 Vector2 colliderVel = collision.rigidbody.velocity;
 
