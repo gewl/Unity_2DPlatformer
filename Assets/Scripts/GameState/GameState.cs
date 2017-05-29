@@ -4,25 +4,25 @@ using UnityEngine;
 
 public class GameState : MonoBehaviour {
 
-    GameObject god;
     GameObject player;
+    GameObject gameOverDisplay;
 
 	void Start () {
-        god = GameObject.Find("GameOverDisplay");
-        god.SetActive(false);
-
         player = GameObject.Find("Player");
+        gameOverDisplay = GameObject.Find("GameOverDisplay");
+        gameOverDisplay.SetActive(false);
 	}
 
     public void GameOver ()
     {
-        god.SetActive(true);
+        Debug.Log(gameOverDisplay);
+        gameOverDisplay.SetActive(true);
         player.SetActive(false);
     }
 
     public void Restart()
     {
-        god.SetActive(false);
+        gameOverDisplay.SetActive(false);
         player.SetActive(true);
         player.GetComponent<PlayerController>().Respawn();
     }

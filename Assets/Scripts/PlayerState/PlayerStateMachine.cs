@@ -68,7 +68,6 @@ public class PlayerStateMachine : ScriptableObject {
 
     public void Update()
     {
-        Debug.Log(currentState);
         if (nextState != null)
         {
             if (currentState != null)
@@ -79,6 +78,7 @@ public class PlayerStateMachine : ScriptableObject {
 
             currentState = nextState;
             currentState.Enter();
+            Debug.Log(currentState);
 
             nextState = null;
 
