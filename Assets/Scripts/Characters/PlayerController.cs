@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour {
         playerAnim = GetComponent<Animator>();
 
         psm = ScriptableObject.CreateInstance<PlayerStateMachine>();
-
+        hc = GameObject.FindObjectOfType<HealthController>();
     }
 
     void Update()
