@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour {
     public Collider2D bodyCollider;
     public BoxCollider2D headCollider;
 
-    private PlayerController pc; 
+    private PlayerController playerController; 
 
     // Set in individual children scripts
     protected ScoreController scoreController;
@@ -16,9 +16,10 @@ public class Enemy : MonoBehaviour {
     protected bool isDead = false;
     protected bool isMovingLeft = true;
 
-    public void Start()
+    public void Awake()
     {
-        pc = GameObject.FindObjectOfType<PlayerController>();
+        playerController = GameObject.FindObjectOfType<PlayerController>();
+        Debug.Log(playerController);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -40,7 +41,7 @@ public class Enemy : MonoBehaviour {
             headCollider.enabled = false;
 
             // Boing!
-            pc.Jump();
+            playerController.Jump();
             // Add to/update score.
             scoreController.increaseScore(this.transform.name);
         }

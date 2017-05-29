@@ -28,7 +28,6 @@ public class GameOverController : MonoBehaviour {
 
     private void OnEnable()
     {
-        Debug.Log(primaryText);
         primaryText.enabled = true;
         childTextObject.SetActive(true);
     }

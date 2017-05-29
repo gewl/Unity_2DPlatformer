@@ -252,7 +252,7 @@ public class JumpState : PlayerState
         {
             Machine.ForceSwitchState(new WalkState(Machine));
         }
-        vel.y -= 50f * Time.deltaTime;
+        vel.y -= 70f * Time.deltaTime;
         Machine.PlayerRb.velocity = vel;
 
         if (Input.GetKeyDown(KeyCode.Space) && Machine.PlayerController.CurrentLaddersTouching > 0)
@@ -276,7 +276,6 @@ public class InvulnState : PlayerState
 
     public override void Exit()
     {
-        Machine.PlayerRb.drag = 0;
     }
 
     public override void Update()
@@ -289,7 +288,6 @@ public class InvulnState : PlayerState
                 Machine.PlayerController.Blink();
             } else if (invulnTimer % 10 == 0)
             {
-                Machine.PlayerRb.drag = 10;
                 Machine.PlayerController.Blink();
             } else if (invulnTimer % 5 == 0)
             {
@@ -304,7 +302,7 @@ public class InvulnState : PlayerState
     public override void FixedUpdate()
     {
         Vector2 vel = Machine.PlayerRb.velocity;
-        vel.y -= 50f * Time.deltaTime;
+        vel.y -= 70f * Time.deltaTime;
         Machine.PlayerRb.velocity = vel;
     }
 }
