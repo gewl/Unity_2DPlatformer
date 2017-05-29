@@ -274,10 +274,6 @@ public class InvulnState : PlayerState
         invulnTimer = 40;
     }
 
-    public override void Exit()
-    {
-    }
-
     public override void Update()
     {
         if (invulnTimer > 0)
