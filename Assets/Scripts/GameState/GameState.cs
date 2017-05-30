@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameState : MonoBehaviour {
 
@@ -18,6 +19,8 @@ public class GameState : MonoBehaviour {
         gameOverDisplay.SetActive(false);
 
         pauseDisplayText = GameObject.Find("PauseDisplay").GetComponent<Text>();
+
+        Debug.Log(SceneManager.GetActiveScene().buildIndex);
 	}
 
     private void Update()
