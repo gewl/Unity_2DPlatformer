@@ -18,9 +18,6 @@ public class PlayerController : MonoBehaviour {
 
     // Variable values for movement
     private Vector2 vel;
-    private int currentGroundColliders = 0;
-    private int jumpTimer;
-    private bool hasDoubleJumped = false;
 
     private int currentLaddersTouching = 0;
     public int CurrentLaddersTouching { get { return currentLaddersTouching;  } }
@@ -138,7 +135,7 @@ public class PlayerController : MonoBehaviour {
         isDead = false;
         spriteRenderer.flipY = false;
         bodyCollider.isTrigger = false;
-        currentGroundColliders = 0;
+        //currentGroundColliders = 0;
 
         transform.position = lastCheckpoint.transform.position;
 
@@ -167,10 +164,6 @@ public class PlayerController : MonoBehaviour {
 
         switch (collisionGo.tag)
         {
-            case "Ground":
-                currentGroundColliders++;
-                break;
-            // This refers to colliding with the "body" of the enemy, not the boingable head.
             case "Enemy":
                 psm.AttemptToDamage();
 
@@ -193,19 +186,7 @@ public class PlayerController : MonoBehaviour {
 
                 rb.AddForce(new Vector2(xRebound, 50f * yRebound), ForceMode2D.Impulse);
                 break;
-            default:
-                Debug.Log(collisionGo.tag);
-                break;
         }
     }
 
-    private void OnCollisionExit2D(Collision2D collision)
-    { 
-        GameObject collisionGo = collision.gameObject;
-
-        if (collisionGo.tag == "Ground")
-        {
-            currentGroundColliders--;
-        } 
-    }
 }

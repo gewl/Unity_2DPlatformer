@@ -19,7 +19,6 @@ public class Enemy : MonoBehaviour {
     public void Awake()
     {
         playerController = GameObject.FindObjectOfType<PlayerController>();
-        Debug.Log(playerController);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
